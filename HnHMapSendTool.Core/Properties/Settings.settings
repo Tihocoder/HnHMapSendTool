@@ -1,0 +1,24 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="HnHMapSendTool.Core.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="SessionDirMask" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">yyyy-MM-dd HH.mm.ss</Value>
+    </Setting>
+    <Setting Name="TileFileExtension" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">png</Value>
+    </Setting>
+    <Setting Name="PreviouslyUploadedSessionFileName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">PreviouslyUploadedSession.txt</Value>
+    </Setting>
+    <Setting Name="RESTPostTimeout" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">10000</Value>
+    </Setting>
+    <Setting Name="RESTPostUserAgent" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">HnHMapSendTool</Value>
+    </Setting>
+    <Setting Name="SessionsDirectory" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D:\Games\HnH\Amber\map</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
