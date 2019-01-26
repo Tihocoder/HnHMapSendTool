@@ -111,5 +111,15 @@ namespace HnHMapSendTool.WpfUI
 			App.LogError(ex);
 			LogMessage(ex.Message);
 		}
+
+		private void CloseButton_Click(object sender, RoutedEventArgs e)
+		{
+			Application.Current.Shutdown();
+		}
+
+		private void SendAllMenuItem_Click(object sender, RoutedEventArgs e)
+		{
+			_sendToolViewModel.SendAllNewSessions();
+		}
 	}
 }
