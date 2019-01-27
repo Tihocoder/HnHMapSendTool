@@ -29,16 +29,20 @@ namespace HnHMapSendTool.WpfUI
 		public MainWindow()
         {
             InitializeComponent();
-			_lastWindowState = this.WindowState;
 
 			_sendToolViewModel = new Core.SendToolViewModel(ProcessError, LogMessage);
 			DataContext = _sendToolViewModel;
+
+			/*if (!String.IsNullOrEmpty(_sendToolViewModel.SessionsDirectory) && !String.IsNullOrEmpty(_sendToolViewModel.Url))
+				this.WindowState = WindowState.Minimized;*/
+
+			_lastWindowState = this.WindowState;
 
 			_notifier = new WinForms.NotifyIcon();
 			_notifier.MouseDown += Notifier_MouseDown;
 			_notifier.MouseDoubleClick += Notifier_MouseDoubleClick;
 			_notifier.Text = "HnHMapSendTool";
-			_notifier.Icon = System.Drawing.Icon.FromHandle(Properties.Resources.MapIcon.GetHicon());
+			_notifier.Icon = Properties.Resources.MapIcon;
 			_notifier.Visible = true;
 		}
 
@@ -99,17 +103,29 @@ namespace HnHMapSendTool.WpfUI
 
 		private void LogMessage(string message)
 		{
-			if (OutputListBox.Items.Count > MAX_MESSEGES_IN_OUTPUT)
-				OutputListBox.Items.RemoveAt(0);
-			OutputListBox.Items.Add($"{DateTime.Now} - {message}");
-			OutputListBox.Items.MoveCurrentToLast();
-			OutputListBox.ScrollIntoView(OutputListBox.Items.CurrentItem);
+			LogMessage(message, false);
+		}
+
+		private void LogMessage(string message, bool isWarning)
+		{
+			Dispatcher.Invoke((Action)delegate
+			{
+				lock (OutputListBox)
+				{
+					if (OutputListBox.Items.Count > MAX_MESSEGES_IN_OUTPUT)
+						OutputListBox.Items.RemoveAt(0);
+					OutputElement outputElement = new OutputElement(message, isWarning);
+					OutputListBox.Items.Add(outputElement);
+					OutputListBox.Items.MoveCurrentToLast();
+					OutputListBox.ScrollIntoView(outputElement);
+				}
+			});
 		}
 
 		private void ProcessError(Exception ex)
 		{
 			App.LogError(ex);
-			LogMessage(ex.Message);
+			LogMessage(ex.Message, true);
 		}
 
 		private void CloseButton_Click(object sender, RoutedEventArgs e)
@@ -120,6 +136,31 @@ namespace HnHMapSendTool.WpfUI
 		private void SendAllMenuItem_Click(object sender, RoutedEventArgs e)
 		{
 			_sendToolViewModel.SendAllNewSessions();
+		}
+
+		private void SessionsDirectoryButton_Click(object sender, RoutedEventArgs e)
+		{
+			var dir = GetDirectoryName(_sendToolViewModel.SessionsDirectory);
+			if (!String.IsNullOrEmpty(dir))
+				_sendToolViewModel.SessionsDirectory = dir;
+		}
+
+		private void MoveDirectoryButton_Click(object sender, RoutedEventArgs e)
+		{
+			var dir = GetDirectoryName(_sendToolViewModel.MoveDirectory);
+			if (!String.IsNullOrEmpty(dir))
+				_sendToolViewModel.MoveDirectory = dir;
+		}
+
+		private string GetDirectoryName(string currentDirectory)
+		{
+			var folderBrowserDialog = new WinForms.FolderBrowserDialog();
+			folderBrowserDialog.SelectedPath = currentDirectory;
+			var result = folderBrowserDialog.ShowDialog();
+			if (result == WinForms.DialogResult.OK)
+				return folderBrowserDialog.SelectedPath;
+			else
+				return string.Empty;
 		}
 	}
 }

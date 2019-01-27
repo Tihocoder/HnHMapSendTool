@@ -8,6 +8,12 @@ namespace HnHMapSendTool.Core
 {
 	interface ISender
 	{
-		void Send(Stream package, string packageName);
+		/// <summary>
+		/// Отправляет сессию
+		/// </summary>
+		/// <param name="package">Запакованная сессия для отправки</param>
+		/// <param name="packageName">Имя сессии/пакета</param>
+		/// <returns>Ответ получателя</returns>
+		string Send(Stream package, string packageName);
 	}
 }

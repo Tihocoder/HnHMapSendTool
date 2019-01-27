@@ -34,10 +34,10 @@ namespace HnHMapSendTool.Core.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("png")]
-        public string TileFileExtension {
+        [global::System.Configuration.DefaultSettingValueAttribute("tile_*_*.png")]
+        public string TileFileMask {
             get {
-                return ((string)(this["TileFileExtension"]));
+                return ((string)(this["TileFileMask"]));
             }
         }
         
@@ -70,13 +70,85 @@ namespace HnHMapSendTool.Core.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("D:\\Games\\HnH\\Amber\\map")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string SessionsDirectory {
             get {
                 return ((string)(this["SessionsDirectory"]));
             }
             set {
                 this["SessionsDirectory"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Url {
+            get {
+                return ((string)(this["Url"]));
+            }
+            set {
+                this["Url"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string MoveDirectory {
+            get {
+                return ((string)(this["MoveDirectory"]));
+            }
+            set {
+                this["MoveDirectory"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int DoneSessionsWorkType {
+            get {
+                return ((int)(this["DoneSessionsWorkType"]));
+            }
+            set {
+                this["DoneSessionsWorkType"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string UrlLogin {
+            get {
+                return ((string)(this["UrlLogin"]));
+            }
+            set {
+                this["UrlLogin"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string UrlPassword {
+            get {
+                return ((string)(this["UrlPassword"]));
+            }
+            set {
+                this["UrlPassword"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SenderName {
+            get {
+                return ((string)(this["SenderName"]));
+            }
+            set {
+                this["SenderName"] = value;
             }
         }
     }

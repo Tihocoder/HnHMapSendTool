@@ -15,7 +15,7 @@ namespace HnHMapSendTool.Core
 			_outputDirectory = outputDirectory.TrimEnd('\\');
 		}
 
-		public void Send(Stream package, string packageName)
+		public string Send(Stream package, string packageName)
 		{
 			string modificator = "";
 			int i = 0;
@@ -33,6 +33,8 @@ namespace HnHMapSendTool.Core
 			{
 				Helper.CopyStreamToStream(package, fs);
 			}
+
+			return $"done"; //FIXME: Текстовые константы на уровень интерфейса.
 		}
 	}
 }

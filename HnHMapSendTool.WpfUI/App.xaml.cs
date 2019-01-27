@@ -16,25 +16,30 @@ namespace HnHMapSendTool.WpfUI
     {
 		private static string ERROR_FILENAME = System.IO.Directory.GetCurrentDirectory().TrimEnd('\\') + "\\error.log";
 
+		private static object _logLocker = new object();
+
 		public static void LogError(Exception ex)
 		{
-			LogToFile(string.Format
-				(
-					"\t{0}{1}\t-\t{2}\t:\t{3}{0}{4}{0}Assebly Version: {5}",
-					Environment.NewLine,
-					DateTime.Now,
-					ex.GetType(),
-					ex.Message,
-					GetStackTrace(ex),
-
-					System.Reflection.Assembly.GetEntryAssembly().GetName().Version
-				)
-			, ERROR_FILENAME);
-
-			if (ex.InnerException != null)
+			lock (_logLocker)
 			{
-				LogToFile(Environment.NewLine + "InnerException : ", ERROR_FILENAME);
-				LogError(ex.InnerException);
+				LogToFile(string.Format
+					(
+						"\t{0}{1}\t-\t{2}\t:\t{3}{0}{4}{0}Assebly Version: {5}",
+						Environment.NewLine,
+						DateTime.Now,
+						ex.GetType(),
+						ex.Message,
+						GetStackTrace(ex),
+
+						System.Reflection.Assembly.GetEntryAssembly().GetName().Version
+					)
+				, ERROR_FILENAME);
+
+				if (ex.InnerException != null)
+				{
+					LogToFile(Environment.NewLine + "InnerException : ", ERROR_FILENAME);
+					LogError(ex.InnerException);
+				}
 			}
 
 		}
