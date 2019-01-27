@@ -21,7 +21,7 @@ namespace HnHMapSendTool.Core
 		{
 			_errorLoggerCallback = errorLoggerCallback;
 			_sessionsSentCallback = sessionsSentCallback;
-			SendAllNewSessionsCommand = new RelayCommand(() => SendAllNewSessions(), () => { return !String.IsNullOrEmpty(SessionsDirectory); });
+			SendAllNewSessionsCommand = new RelayCommand(SendAllNewSessions);
 		}
 
 		/// <summary>
@@ -154,6 +154,20 @@ namespace HnHMapSendTool.Core
 		public void SendAllNewSessions()
 		{
 			//TODO: Асинхронность, при том, что в .net3.5 нет Task'ов
+			if (String.IsNullOrEmpty(SessionsDirectory))
+			{
+				//FIXME: сообщение об ошибках переделать, что бы не исползовать класс Exception, все тексты на уровень интерфейса!
+				_errorLoggerCallback?.Invoke(new Exception("Не задан путь к сессиям карты"));
+				return;
+			}
+
+			if (String.IsNullOrEmpty(Url))
+			{
+				//FIXME: сообщение об ошибках переделать, что бы не исползовать класс Exception, все тексты на уровень интерфейса!
+				_errorLoggerCallback?.Invoke(new Exception("Не задан Url, куда отправлять"));
+				return;
+			}
+
 			MapSessionsDispatcher mapSessionsDispatcher = new MapSessionsDispatcher(SessionsDirectory, WorkType, MoveDirectory);
 			var sessions = mapSessionsDispatcher.GetNewSessions().ToList();
 
