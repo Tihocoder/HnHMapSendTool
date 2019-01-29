@@ -12,9 +12,11 @@ namespace HnHMapSendTool.Core
 		private string _url;
 		private ICredentials _credentials;
 		private string _sender;
+		private readonly Encoding _encoding;
 
 		public RESTPostSender(string url, string user, string password, string sender)
 		{
+			_encoding = Encoding.UTF8;
 			_url = url;
 			_sender = sender;
 			if (String.IsNullOrEmpty(user))
@@ -29,69 +31,54 @@ namespace HnHMapSendTool.Core
 
 		public string Send(Stream package, string packageName)
 		{
-			using (MemoryStream output = new MemoryStream())
-			{
-				Helper.CopyStreamToStream(package, output);
-				return SendFile(_url, output, packageName);
-			}
+			package.Position = 0;
+			byte[] data = new byte[package.Length];
+			package.Read(data, 0, data.Length);
+			return SendFile(_url, data, $"{packageName}.zip");
 		}
 
-
-		//TODOL Проверка сертификата для https (пока что все подходят)
-		private System.Net.Security.RemoteCertificateValidationCallback GetApproveAllCertificateCallback()
+		private string SendFile(string url, byte[] data, string filename)
 		{
-			return delegate (object sender, System.Security.Cryptography.X509Certificates.X509Certificate certificate,
-											System.Security.Cryptography.X509Certificates.X509Chain chain,
-											System.Net.Security.SslPolicyErrors sslPolicyErrors)
+			string boundary = String.Format("----------{0:N}", Guid.NewGuid());
+
+			byte[] body;
+			using (MemoryStream bodyStream = new System.IO.MemoryStream())
 			{
-				return true;
-			};
-		}
+				string header = $"--{boundary}\r\nContent-Disposition: form-data; name=\"{filename}\"; filename=\"{filename}\";\r\nContent-Type: application/zip\r\n\r\n";
+				byte[] headerBytes = _encoding.GetBytes(header);
+				bodyStream.Write(headerBytes, 0, headerBytes.Length);
+				//Helper.CopyStreamToStream(data, bodyStream);
+				bodyStream.Write(data, 0, data.Length);
+				string footer = $"\r\n--{boundary}--\r\n";
+				byte[] footerBytes = _encoding.GetBytes(footer);
+				bodyStream.Write(footerBytes, 0, footerBytes.Length);
 
-		public string SendFile(string url, MemoryStream data, string filename)
-		{
-			WebResponse response = null;
-			var callback = GetApproveAllCertificateCallback();
-			try
-			{
-				System.Net.ServicePointManager.ServerCertificateValidationCallback += callback;
-				string boundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
-				byte[] boundarybytes = System.Text.Encoding.ASCII.GetBytes("/r/n--" + boundary + "/r/n");
-
-				HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(url);
-				wr.ContentType = "multipart/form-data; boundary=" + boundary;
-				wr.Method = "POST";
-				wr.KeepAlive = true;
-				wr.Credentials = _credentials;
-				using (Stream requestStream = wr.GetRequestStream())
-				{
-					requestStream.Write(boundarybytes, 0, boundarybytes.Length);
-					byte[] formitembytes = System.Text.Encoding.UTF8.GetBytes(filename);
-					requestStream.Write(formitembytes, 0, formitembytes.Length);
-					requestStream.Write(boundarybytes, 0, boundarybytes.Length);
-					byte[] headerbytes = System.Text.Encoding.UTF8.GetBytes($"Content-Disposition: form-data; usertag=\"{_sender}\"; name=\"file\"; filename=\"{filename}\"/r/nContent-Type:zip/r/n/r/n");
-					requestStream.Write(headerbytes, 0, headerbytes.Length);
-
-					byte[] file = data.ToArray();
-					requestStream.Write(file, 0, file.Length);
-
-					byte[] trailer = System.Text.Encoding.ASCII.GetBytes("/r/n--" + boundary + "--/r/n");
-					requestStream.Write(trailer, 0, trailer.Length);
-					requestStream.Close();
-				}
-				response = wr.GetResponse();
-				using (Stream responseStream = response.GetResponseStream())
-				{
-					StreamReader streamReader = new StreamReader(responseStream);
-					string responseData = streamReader.ReadToEnd();
-					return responseData;
-				}
+				body = bodyStream.ToArray();
 			}
-			finally
+
+			HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
+			request.Method = "POST";
+			request.ContentType = $"multipart/form-data; boundary={boundary}";
+			request.UserAgent = "HnHMapSendTool";
+			request.CookieContainer = new CookieContainer();
+			request.ContentLength = body.Length;
+			request.Credentials = _credentials;
+			request.KeepAlive = true;
+			request.Timeout = 1000*20;
+
+			using (Stream requestStream = request.GetRequestStream())
 			{
-				System.Net.ServicePointManager.ServerCertificateValidationCallback -= callback;
-				if (response != null)
-					response.Close();
+				requestStream.Write(body, 0, body.Length);
+				requestStream.Close();
+			}
+
+			WebResponse response = request.GetResponse();
+
+			using (Stream responseStream = response.GetResponseStream())
+			{
+				StreamReader streamReader = new StreamReader(responseStream);
+				string responseData = streamReader.ReadToEnd();
+				return responseData;
 			}
 		}
 	}
