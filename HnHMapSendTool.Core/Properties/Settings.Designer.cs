@@ -151,5 +151,14 @@ namespace HnHMapSendTool.Core.Properties {
                 this["SenderName"] = value;
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ids.txt")]
+        public string IdsFileName {
+            get {
+                return ((string)(this["IdsFileName"]));
+            }
+        }
     }
 }

@@ -38,5 +38,8 @@
     <Setting Name="SenderName" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="IdsFileName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ids.txt</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

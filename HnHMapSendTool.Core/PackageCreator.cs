@@ -16,7 +16,8 @@ namespace HnHMapSendTool.Core
 		public static Stream CreateZipPackage(string directory)
 		{
 			DirectoryInfo sourceDir = new DirectoryInfo(directory);
-			var files = sourceDir.GetFiles();
+			List<FileInfo> files = sourceDir.GetFiles(Properties.Settings.Default.IdsFileName).ToList();
+			files.AddRange(sourceDir.GetFiles(Properties.Settings.Default.TileFileMask));
 
 			Stream packageStream = new MemoryStream();
 
