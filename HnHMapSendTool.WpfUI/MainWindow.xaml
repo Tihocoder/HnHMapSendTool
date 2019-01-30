@@ -5,11 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HnHMapSendTool.WpfUI"
         mc:Ignorable="d"
-        Title="Отправка данных карты из HnH" Height="800" Width="1000" MinHeight="450" MinWidth="800" StateChanged="Window_StateChanged" FontSize="16">
+        Title="Отправка данных карты из HnH" Height="800" Width="1000" MinHeight="600" MinWidth="800" StateChanged="Window_StateChanged" FontSize="16">
 	<Window.Resources>
 		<ContextMenu x:Key="NotifierContextMenu" Placement="MousePoint">
 			<MenuItem Header="Отправить всё" Click="SendAllMenuItem_Click"/>
+			<MenuItem Header="Скачать координаты" Click="DownloadMenuItem_Click"/>
+			<Separator/>
 			<MenuItem Header="Настройки" Click="OpenMainWindowMenuItem_Click"/>
+			<Separator/>
 			<MenuItem Header="Закрыть" Click="CloseMenuItem_Click"/>
 		</ContextMenu>
 		<Style x:Key="MoveDirectoryInputStyle" TargetType="{x:Type FrameworkElement}">
@@ -45,6 +48,11 @@
 					<RowDefinition Height="auto"/>
 					<RowDefinition Height="auto"/>
 					<RowDefinition Height="auto"/>
+					<RowDefinition Height="20"/>
+					<RowDefinition Height="auto"/>
+					<RowDefinition Height="auto"/>
+					<RowDefinition Height="auto"/>
+					<RowDefinition Height="auto"/>
 				</Grid.RowDefinitions>
 				<TextBlock Grid.Row="0" Grid.Column="0" Text="Имя отправителя:" Margin="5" HorizontalAlignment="Left" VerticalAlignment="Center"/>
 				<TextBox Grid.Row="0" Grid.Column="1" Margin="0,5,5,5" Text="{Binding SenderName}"/>
@@ -54,14 +62,14 @@
 					<TextBox Name="SessionsDirectoryTextBox" Margin="0,5" Text="{Binding SessionsDirectory}"/>
 				</DockPanel>
 				<TextBlock Grid.Row="2" Grid.Column="0" Text="Принимающий URL:" Margin="5" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-				<TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Margin="0,5,5,5" Text="{Binding Url}"/>
+				<TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Margin="0,5,5,5" Text="{Binding UploadUrl}"/>
 				<DockPanel Grid.Row="3" Grid.Column="1">
 					<TextBlock Text="Логин:" Margin="5" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-					<TextBox Margin="0,5,5,5" Text="{Binding UrlLogin}"/>
+					<TextBox Margin="0,5,5,5" Text="{Binding UploadUrlLogin}"/>
 				</DockPanel>
 				<DockPanel Grid.Row="3" Grid.Column="2">
 					<TextBlock Text="Пароль:" Margin="5" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-					<TextBox Margin="0,5,5,5" Text="{Binding UrlPassword}"/>
+					<TextBox Margin="0,5,5,5" Text="{Binding UploadUrlPassword}"/>
 				</DockPanel>
 				<TextBlock Grid.Row="4" Grid.Column="0" Text="Обработанные сессии:" Margin="5" HorizontalAlignment="Left" VerticalAlignment="Center"/>
 				<StackPanel Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3" Orientation="Horizontal">
@@ -74,9 +82,30 @@
 					<Button Name="MoveDirectoryButton" Content="Обзор..." Margin="5" Padding="5,0" DockPanel.Dock="Right" Click="MoveDirectoryButton_Click"/>
 					<TextBox Name="MoveDirectoryTextBox" Margin="0,5" Text="{Binding MoveDirectory}"/>
 				</DockPanel>
+
+				<TextBlock Grid.Row="7" Grid.Column="0" Text="URL для координат:" Margin="5" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+				<TextBox Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="3" Margin="0,5,5,5" Text="{Binding DownloadUrl}"/>
+				<CheckBox Grid.Row="8" Grid.Column="0" Content="Автоматически" Margin="5" VerticalAlignment="Center" IsChecked="{Binding IsAutoDownloadGlobalСoordinates}"/>
+				<DockPanel Grid.Row="8" Grid.Column="1">
+					<TextBlock Text="Логин:" Margin="5" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+					<TextBox Margin="0,5,5,5" Text="{Binding DownloadUrlLogin}"/>
+				</DockPanel>
+				<DockPanel Grid.Row="8" Grid.Column="2">
+					<TextBlock Text="Пароль:" Margin="5" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+					<TextBox Margin="0,5,5,5" Text="{Binding DownloadUrlPassword}"/>
+				</DockPanel>
+				<TextBlock Grid.Row="9" Grid.Column="0" Text="Путь для сохранения:" Margin="5" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+				<DockPanel Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="3">
+					<Button Name="GlobalСoordinatesDirectoryButton" Content="Обзор..." Margin="5" Padding="5,0" DockPanel.Dock="Right" Click="GlobalСoordinatesDirectoryButton_Click"/>
+					<TextBox Name="GlobalСoordinatesDirectoryTextBox" Margin="0,5" Text="{Binding GlobalСoordinatesDirectory}"/>
+				</DockPanel>
 			</Grid>
 		</GroupBox>
-		<Button Grid.Row="1" Content="Отправить всё" Padding="5,5" Width="410" Margin="5" Command="{Binding SendAllNewSessionsCommand}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+		<StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+			<Button Grid.Row="1" Content="Отправить всё" Padding="5,5" Width="300" Margin="5" Command="{Binding SendAllNewSessionsCommand}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+			<Button Grid.Row="1" Content="Скачать координаты" Padding="5,5" Width="300" Margin="5" Command="{Binding DownloadGlobalСoordinatesCommand}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+		</StackPanel>
+		
 		<ListBox Grid.Row="2" Margin="5" Name="OutputListBox">
 			<ListBox.ItemTemplate>
 				<DataTemplate DataType="{x:Type local:OutputElement}">

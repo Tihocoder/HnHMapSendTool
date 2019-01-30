@@ -29,10 +29,7 @@ namespace HnHMapSendTool.Core
 			}
 			while (File.Exists(outputFileName));
 
-			using (FileStream fs = new FileStream(outputFileName, FileMode.OpenOrCreate))
-			{
-				Helper.CopyStreamToStream(package, fs);
-			}
+			Helper.SaveAsFile(package, outputFileName, FileMode.OpenOrCreate);
 
 			return $"done"; //FIXME: Текстовые константы на уровень интерфейса.
 		}

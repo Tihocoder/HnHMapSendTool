@@ -20,7 +20,7 @@
     <Setting Name="SessionsDirectory" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="Url" Type="System.String" Scope="User">
+    <Setting Name="UploadUrl" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="MoveDirectory" Type="System.String" Scope="User">
@@ -29,10 +29,10 @@
     <Setting Name="DoneSessionsWorkType" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="UrlLogin" Type="System.String" Scope="User">
+    <Setting Name="UploadUrlLogin" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="UrlPassword" Type="System.String" Scope="User">
+    <Setting Name="UploadUrlPassword" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="SenderName" Type="System.String" Scope="User">
@@ -40,6 +40,27 @@
     </Setting>
     <Setting Name="IdsFileName" Type="System.String" Scope="Application">
       <Value Profile="(Default)">ids.txt</Value>
+    </Setting>
+    <Setting Name="DownloadUrl" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="DownloadUrlLogin" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="DownloadUrlPassword" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="GlobalСoordinatesDirectory" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="IsAutoDownloadGlobalСoordinates" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="GlobalСoordinatesFileName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">grid_ids.txt</Value>
+    </Setting>
+    <Setting Name="RequestsTimeouts" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">20000</Value>
     </Setting>
   </Settings>
 </SettingsFile>

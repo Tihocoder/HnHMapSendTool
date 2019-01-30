@@ -20,5 +20,13 @@ namespace HnHMapSendTool.Core
 			source.Read(buffer, 0, buffer.Length);
 			dest.Write(buffer, 0, buffer.Length);
 		}
+
+		public static void SaveAsFile(Stream source, string filepatch, FileMode mode)
+		{
+			using (FileStream fs = new FileStream(filepatch, mode))
+			{
+				CopyStreamToStream(source, fs);
+			}
+		}
 	}
 }

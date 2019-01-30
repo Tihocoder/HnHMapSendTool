@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Enums.cs" />
+    <Compile Include="FileDownloader.cs" />
     <Compile Include="FileSender.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="HnHMapSession.cs" />

@@ -83,12 +83,12 @@ namespace HnHMapSendTool.Core.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string Url {
+        public string UploadUrl {
             get {
-                return ((string)(this["Url"]));
+                return ((string)(this["UploadUrl"]));
             }
             set {
-                this["Url"] = value;
+                this["UploadUrl"] = value;
             }
         }
         
@@ -119,24 +119,24 @@ namespace HnHMapSendTool.Core.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string UrlLogin {
+        public string UploadUrlLogin {
             get {
-                return ((string)(this["UrlLogin"]));
+                return ((string)(this["UploadUrlLogin"]));
             }
             set {
-                this["UrlLogin"] = value;
+                this["UploadUrlLogin"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string UrlPassword {
+        public string UploadUrlPassword {
             get {
-                return ((string)(this["UrlPassword"]));
+                return ((string)(this["UploadUrlPassword"]));
             }
             set {
-                this["UrlPassword"] = value;
+                this["UploadUrlPassword"] = value;
             }
         }
         
@@ -158,6 +158,84 @@ namespace HnHMapSendTool.Core.Properties {
         public string IdsFileName {
             get {
                 return ((string)(this["IdsFileName"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string DownloadUrl {
+            get {
+                return ((string)(this["DownloadUrl"]));
+            }
+            set {
+                this["DownloadUrl"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string DownloadUrlLogin {
+            get {
+                return ((string)(this["DownloadUrlLogin"]));
+            }
+            set {
+                this["DownloadUrlLogin"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string DownloadUrlPassword {
+            get {
+                return ((string)(this["DownloadUrlPassword"]));
+            }
+            set {
+                this["DownloadUrlPassword"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string GlobalСoordinatesDirectory {
+            get {
+                return ((string)(this["GlobalСoordinatesDirectory"]));
+            }
+            set {
+                this["GlobalСoordinatesDirectory"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool IsAutoDownloadGlobalСoordinates {
+            get {
+                return ((bool)(this["IsAutoDownloadGlobalСoordinates"]));
+            }
+            set {
+                this["IsAutoDownloadGlobalСoordinates"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("grid_ids.txt")]
+        public string GlobalСoordinatesFileName {
+            get {
+                return ((string)(this["GlobalСoordinatesFileName"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("20000")]
+        public int RequestsTimeouts {
+            get {
+                return ((int)(this["RequestsTimeouts"]));
             }
         }
     }

@@ -138,6 +138,11 @@ namespace HnHMapSendTool.WpfUI
 			_sendToolViewModel.SendAllNewSessions();
 		}
 
+		private void DownloadMenuItem_Click(object sender, RoutedEventArgs e)
+		{
+			_sendToolViewModel.DownloadGlobalСoordinates();
+		}
+
 		private void SessionsDirectoryButton_Click(object sender, RoutedEventArgs e)
 		{
 			var dir = GetDirectoryName(_sendToolViewModel.SessionsDirectory);
@@ -152,6 +157,13 @@ namespace HnHMapSendTool.WpfUI
 				_sendToolViewModel.MoveDirectory = dir;
 		}
 
+		private void GlobalСoordinatesDirectoryButton_Click(object sender, RoutedEventArgs e)
+		{
+			var dir = GetDirectoryName(_sendToolViewModel.GlobalСoordinatesDirectory);
+			if (!String.IsNullOrEmpty(dir))
+				_sendToolViewModel.GlobalСoordinatesDirectory = dir;
+		}
+
 		private string GetDirectoryName(string currentDirectory)
 		{
 			var folderBrowserDialog = new WinForms.FolderBrowserDialog();
@@ -162,5 +174,7 @@ namespace HnHMapSendTool.WpfUI
 			else
 				return string.Empty;
 		}
+
+		
 	}
 }

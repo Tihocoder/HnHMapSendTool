@@ -64,7 +64,7 @@ namespace HnHMapSendTool.Core
 			request.ContentLength = body.Length;
 			request.Credentials = _credentials;
 			request.KeepAlive = true;
-			request.Timeout = 1000*20;
+			request.Timeout = Properties.Settings.Default.RequestsTimeouts;
 
 			using (Stream requestStream = request.GetRequestStream())
 			{
