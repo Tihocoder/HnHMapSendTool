@@ -15,13 +15,10 @@ namespace HnHMapSendTool.Core
 		/// <param name="dest">Stream for append source</param>
 		public static void CopyStreamToStream(Stream source, Stream dest)
 		{
+			byte[] buffer = new byte[source.Length];
 			source.Seek(0, SeekOrigin.Begin);
-			byte[] buffer = new byte[64 * 1024];
-			int read;
-			while ((read = source.Read(buffer, 0, buffer.Length)) > 0)
-			{
-				dest.Write(buffer, 0, read);
-			}
+			source.Read(buffer, 0, buffer.Length);
+			dest.Write(buffer, 0, buffer.Length);
 		}
 	}
 }
