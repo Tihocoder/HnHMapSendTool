@@ -175,17 +175,18 @@ namespace HnHMapSendTool.Core
 			{
 				//ISender sender = new FileSender(SessionsDirectory);
 				ISender sender = new RESTPostSender(Url, UrlLogin, UrlPassword, SenderName);
-				foreach (string session in sessions)
+				foreach (var session in sessions)
 				{
 					try
 					{
-						string responce = sender.Send(PackageCreator.CreateZipPackage($"{SessionsDirectory.TrimEnd('\\')}\\{session}"), session);
+						string responce = sender.Send(PackageCreator.CreateZipPackage(session.FolderPatch), session.Name);
 						mapSessionsDispatcher.SessionIsSent(session);
-						_sessionsSentCallback?.Invoke($"Сессия {session}: {responce}");
+						//FIXME: сообщение об ошибках переделать, что бы не исползовать класс Exception, все тексты на уровень интерфейса!
+						_sessionsSentCallback?.Invoke($"Сессия {session.Name} (Фрагменты: {session.FilesCount - 1}): {responce}"); 
 					}
 					catch (Exception ex)
 					{
-						_errorLoggerCallback?.Invoke(new Exception($"Сессия {session}: {ex.Message}", ex));
+						_errorLoggerCallback?.Invoke(new Exception($"Сессия {session.Name}: {ex.Message}", ex));
 					}
 				}
 			}

@@ -9,6 +9,8 @@ namespace HnHMapSendTool.Core
 {
 	internal class MapSessionsDispatcher
 	{
+		private const char FILES_COUNT_SEPARATOR = '|';
+
 		private DoneSessionsWorkType _workType;
 		private string _sessionsDirectory;
 		private string _moveDirectory;
@@ -20,17 +22,21 @@ namespace HnHMapSendTool.Core
 			_moveDirectory = moveDirectory?.TrimEnd('\\');
 		}
 
-		public IEnumerable<string> GetNewSessions()
+		public IEnumerable<HnHMapSession> GetNewSessions()
 		{
 			if (!Directory.Exists(_sessionsDirectory))
 				yield break;
 
-			HashSet<string> previouslyUploadedSession;
+			Dictionary<string, int> previouslyUploadedSession;
 			string previouslyUploadedSessionFile = $"{_sessionsDirectory}\\{Properties.Settings.Default.PreviouslyUploadedSessionFileName}";
 			if (File.Exists(previouslyUploadedSessionFile))
-				previouslyUploadedSession = new HashSet<string>(File.ReadAllLines(previouslyUploadedSessionFile));
+				previouslyUploadedSession = File.ReadAllLines(previouslyUploadedSessionFile)
+					.Where(row => row.Contains(FILES_COUNT_SEPARATOR)) //TODO: Валидация формата с проверкой, что за FILES_COUNT_SEPARATOR стоит число
+					.Select(el => new { datetime = el.Split(FILES_COUNT_SEPARATOR)[0], filescount = Convert.ToInt32(el.Split(FILES_COUNT_SEPARATOR)[1]) })
+					.GroupBy(folderssinfo => folderssinfo.datetime)
+					.ToDictionary(key => key.Key, value => value.Select(groupeditems => groupeditems.filescount).Max());
 			else
-				previouslyUploadedSession = new HashSet<string>();
+				previouslyUploadedSession = new Dictionary<string, int>();
 
 			string sessionDirMask = Properties.Settings.Default.SessionDirMask;
 			string tileFileMask = Properties.Settings.Default.TileFileMask;
@@ -39,8 +45,9 @@ namespace HnHMapSendTool.Core
 			foreach (var dir in dirs)
 			{ 
 				DirectoryInfo dirInfo = new DirectoryInfo(dir);
+				int filecount = dirInfo.GetFiles(tileFileMask).Count();
 
-				if (previouslyUploadedSession.Contains(dirInfo.Name))
+				if (previouslyUploadedSession.ContainsKey(dirInfo.Name) && previouslyUploadedSession[dirInfo.Name] == filecount)
 				{
 					continue;
 				}
@@ -51,46 +58,45 @@ namespace HnHMapSendTool.Core
 					continue;
 				}
 
-				if (!dirInfo.GetFiles(tileFileMask).Any())
+				if (filecount == 0)
 				{
-					if (!dirInfo.GetFiles().Any() && !dirInfo.GetDirectories().Any())
-						dirInfo.Delete();
+					SessionIsSent(new HnHMapSession() { Name = dirInfo.Name, FolderPatch = dir, FilesCount = 0 });
 					continue;
 				}
 
-				yield return dirInfo.Name;
+				yield return new HnHMapSession() { Name = dirInfo.Name, FolderPatch = dir, FilesCount = filecount };
 			}
 		}
 
-		public void SessionIsSent(string sessionName)
+		public void SessionIsSent(HnHMapSession session)
 		{
 			switch (_workType)
 			{
 				case DoneSessionsWorkType.None:
-					MarkSessionAsSent(sessionName);
+					MarkSessionAsSent(session);
 					break;
 				case DoneSessionsWorkType.Delete:
-					DeleteSession(sessionName);
+					DeleteSession(session);
 					break;
 				case DoneSessionsWorkType.Move:
 					if (String.IsNullOrEmpty(_moveDirectory))
-						MarkSessionAsSent(sessionName);
+						MarkSessionAsSent(session);
 					else
-						MoveSession(sessionName, _moveDirectory);
+						MoveSession(session, _moveDirectory);
 					break;
 			}
 			
 		}
 
-		private void MarkSessionAsSent(string sessionName)
+		private void MarkSessionAsSent(HnHMapSession session)
 		{
 			string previouslyUploadedSessionFile = $"{_sessionsDirectory}\\{Properties.Settings.Default.PreviouslyUploadedSessionFileName}";
-			File.AppendAllText(previouslyUploadedSessionFile, sessionName + Environment.NewLine);
+			File.AppendAllText(previouslyUploadedSessionFile, $"{session.Name}{FILES_COUNT_SEPARATOR}{session.FilesCount}{Environment.NewLine}");
 		}
 
-		private void DeleteSession(string sessionName)
+		private void DeleteSession(HnHMapSession session)
 		{
-			DirectoryInfo dirInfo = new DirectoryInfo($"{_sessionsDirectory}\\{sessionName}");
+			DirectoryInfo dirInfo = new DirectoryInfo(session.FolderPatch);
 			var files = dirInfo.GetFiles($"ids.txt|{Properties.Settings.Default.TileFileMask}");
 			foreach (var file in files)
 			{
@@ -100,10 +106,10 @@ namespace HnHMapSendTool.Core
 				dirInfo.Delete();
 		}
 
-		private void MoveSession(string sessionName, string destDirectory)
+		private void MoveSession(HnHMapSession session, string destDirectory)
 		{
-			DirectoryInfo dirInfo = new DirectoryInfo($"{_sessionsDirectory}\\{sessionName}");
-			dirInfo.MoveTo($"{destDirectory}\\{sessionName}");
+			DirectoryInfo dirInfo = new DirectoryInfo(session.FolderPatch);
+			dirInfo.MoveTo($"{destDirectory}\\{session.Name}");
 		}
 	}
 }
