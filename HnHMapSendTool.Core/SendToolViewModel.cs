@@ -182,7 +182,7 @@ namespace HnHMapSendTool.Core
 						string responce = sender.Send(PackageCreator.CreateZipPackage(session.FolderPatch), session.Name);
 						mapSessionsDispatcher.SessionIsSent(session);
 						//FIXME: сообщение об ошибках переделать, что бы не исползовать класс Exception, все тексты на уровень интерфейса!
-						_sessionsSentCallback?.Invoke($"Сессия {session.Name} (Фрагменты: {session.FilesCount - 1}): {responce}"); 
+						_sessionsSentCallback?.Invoke($"Сессия {session.Name} (Фрагменты: {session.FilesCount}): {responce}"); 
 					}
 					catch (Exception ex)
 					{
