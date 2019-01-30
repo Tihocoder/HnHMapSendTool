@@ -173,14 +173,13 @@ namespace HnHMapSendTool.Core
 
 			if (sessions != null && sessions.Any())
 			{
-				PackageCreator packageCreator = new PackageCreator();
 				//ISender sender = new FileSender(SessionsDirectory);
 				ISender sender = new RESTPostSender(Url, UrlLogin, UrlPassword, SenderName);
 				foreach (string session in sessions)
 				{
 					try
 					{
-						string responce = sender.Send(packageCreator.CreateZipPackage($"{SessionsDirectory.TrimEnd('\\')}\\{session}"), session);
+						string responce = sender.Send(PackageCreator.CreateZipPackage($"{SessionsDirectory.TrimEnd('\\')}\\{session}"), session);
 						mapSessionsDispatcher.SessionIsSent(session);
 						_sessionsSentCallback?.Invoke($"Сессия {session}: {responce}");
 					}

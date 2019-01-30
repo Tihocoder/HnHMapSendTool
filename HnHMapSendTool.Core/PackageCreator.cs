@@ -3,26 +3,30 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Packaging;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace HnHMapSendTool.Core
 {
-	internal class PackageCreator
+	internal class PackageCreator : IDisposable
 	{
-		public Stream CreateZipPackage(string directory)
+		private object external;
+		private PackageCreator() { }
+
+		public static Stream CreateZipPackage(string directory)
 		{
 			DirectoryInfo sourceDir = new DirectoryInfo(directory);
 			var files = sourceDir.GetFiles();
 
 			Stream packageStream = new MemoryStream();
-			using (Package package = ZipPackage.Open(packageStream, FileMode.Create))
+
+			using (var package = CreateZip(packageStream))
 			{
 				foreach (var file in files)
 				{
-					PackagePart document = package.CreatePart(new Uri($"/{file.Name}", UriKind.Relative), ""); ///{sourceDir.Name}
 					using (FileStream dataStream = file.Open(FileMode.Open, FileAccess.Read))
 					{
-						using (var zipStream = document.GetStream())
+						using (var zipStream = package.AddFile($"{sourceDir.Name}/{file.Name}"))
 						{
 							Helper.CopyStreamToStream(dataStream, zipStream);
 							zipStream.Close();
@@ -30,10 +34,33 @@ namespace HnHMapSendTool.Core
 						dataStream.Close();
 					}
 				}
-				package.Close();
 			}
+
 			return packageStream;
 		}
 
+		private static PackageCreator CreateZip(Stream stream)
+		{
+			var type = typeof(System.IO.Packaging.Package).Assembly.GetType("MS.Internal.IO.Zip.ZipArchive");
+			var meth = type.GetMethod("OpenOnStream", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+			return new PackageCreator { external = meth.Invoke(null, new object[] { stream, FileMode.OpenOrCreate, FileAccess.ReadWrite, false }) };
+		}
+
+		public Stream AddFile(string path)
+		{
+			var type = external.GetType();
+			var meth = type.GetMethod("AddFile", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+			var comp = type.Assembly.GetType("MS.Internal.IO.Zip.CompressionMethodEnum").GetField("Deflated").GetValue(null);
+			var opti = type.Assembly.GetType("MS.Internal.IO.Zip.DeflateOptionEnum").GetField("Normal").GetValue(null);
+
+			var fileInfo = meth.Invoke(external, new object[] { path, comp, opti });
+			var fileInfoGetStream = fileInfo.GetType().GetMethod("GetStream", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+			return (Stream)fileInfoGetStream.Invoke(fileInfo, new object[] { FileMode.OpenOrCreate, FileAccess.Write });
+		}
+
+		public void Dispose()
+		{
+			((IDisposable)external).Dispose();
+		}
 	}
 }
