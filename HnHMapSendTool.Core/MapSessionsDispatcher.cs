@@ -58,9 +58,9 @@ namespace HnHMapSendTool.Core
 					continue;
 				}
 
-				if (filecount == 0)
+				if (filecount <= 9) //Сессии на 9 и менее тайлов выкидываем.
 				{
-					SessionIsSent(new HnHMapSession() { Name = dirInfo.Name, FolderPatch = dir, FilesCount = 0 });
+					SessionIsSent(new HnHMapSession() { Name = dirInfo.Name, FolderPatch = dir, FilesCount = filecount });
 					continue;
 				}
 
