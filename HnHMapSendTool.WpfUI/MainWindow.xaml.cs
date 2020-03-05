@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using HnHMapSendTool.Core.SettingImportExport;
 using WinForms = System.Windows.Forms;
 
 namespace HnHMapSendTool.WpfUI
@@ -18,7 +19,7 @@ namespace HnHMapSendTool.WpfUI
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, Core.ISendToolViewProvider
     {
 		private const int MAX_MESSEGES_IN_OUTPUT = 1000;
 
@@ -30,7 +31,7 @@ namespace HnHMapSendTool.WpfUI
         {
             InitializeComponent();
 
-			_sendToolViewModel = new Core.SendToolViewModel(ProcessError, LogMessage);
+			_sendToolViewModel = new Core.SendToolViewModel(this, ProcessError, LogMessage);
 			DataContext = _sendToolViewModel;
 
 			/*if (!String.IsNullOrEmpty(_sendToolViewModel.SessionsDirectory) && !String.IsNullOrEmpty(_sendToolViewModel.Url))
@@ -175,6 +176,26 @@ namespace HnHMapSendTool.WpfUI
 				return string.Empty;
 		}
 
-		
+		public void ExportSettings(SettingExportViewModel viewModel)
+		{
+			ShowImportExportSettings(viewModel);
+		}
+
+		public void ImportSettings(SettingImportViewModel viewModel)
+		{
+			ShowImportExportSettings(viewModel);
+		}
+
+		private void ShowImportExportSettings(SIEBaseViewModel viewModel)
+		{
+			SettingImportExportWindow window = new SettingImportExportWindow()
+			{
+				DataContext = viewModel
+				, Owner = this
+			};
+
+			viewModel.OnWorkDone = () => { window.DialogResult = true; };
+			window.ShowDialog();
+		}
 	}
 }

@@ -7,8 +7,9 @@ using System.Windows.Input;
 
 namespace HnHMapSendTool.Core
 {
-	public class SendToolViewModel : INotifyPropertyChanged
+	public class SendToolViewModel : NotifyPropertyViewModel
 	{
+		private ISendToolViewProvider _viewProvider;
 		private Action<Exception> _errorLoggerCallback;
 		private Action<string> _sessionsSentCallback;
 
@@ -17,12 +18,15 @@ namespace HnHMapSendTool.Core
 		/// </summary>
 		/// <param name="errorLoggerCallback">Функция для обработки ошибок, возникших в процессе отправки.</param>
 		/// <param name="sessionsSentCallback">Функция для обработки результата отправки.</param>
-		public SendToolViewModel(Action<Exception> errorLoggerCallback, Action<string> sessionsSentCallback)
+		public SendToolViewModel(ISendToolViewProvider viewProvider, Action<Exception> errorLoggerCallback, Action<string> sessionsSentCallback)
 		{
+			_viewProvider = viewProvider;
 			_errorLoggerCallback = errorLoggerCallback;
 			_sessionsSentCallback = sessionsSentCallback;
 			SendAllNewSessionsCommand = new RelayCommand(SendAllNewSessions);
 			DownloadGlobalСoordinatesCommand = new RelayCommand(DownloadGlobalСoordinates);
+			ExportSettingsCommand = new RelayCommand(ExportSettings);
+			ImportSettingsCommand = new RelayCommand(ImportSettings);
 		}
 
 		#region propertes
@@ -47,6 +51,7 @@ namespace HnHMapSendTool.Core
 		/// <summary>
 		/// Сервер, принимающий запакованные сессии.
 		/// </summary>
+		[SettingImportExport.CanImportExport]
 		public string UploadUrl
 		{
 			get
@@ -64,6 +69,7 @@ namespace HnHMapSendTool.Core
 		/// <summary>
 		/// Логин для принимающего сервера, если надо.
 		/// </summary>
+		[SettingImportExport.CanImportExport]
 		public string UploadUrlLogin
 		{
 			get
@@ -81,6 +87,7 @@ namespace HnHMapSendTool.Core
 		/// <summary>
 		/// Пароль для принимающего сервера, если надо.
 		/// </summary>
+		[SettingImportExport.CanImportExport]
 		public string UploadUrlPassword
 		{
 			get
@@ -132,6 +139,7 @@ namespace HnHMapSendTool.Core
 		/// <summary>
 		/// Имя/тэг отправителя
 		/// </summary>
+		[SettingImportExport.CanImportExport]
 		public string SenderName
 		{
 			get
@@ -149,6 +157,7 @@ namespace HnHMapSendTool.Core
 		/// <summary>
 		/// Путь для загрузки grid_ids.txt с глобальными координатами
 		/// </summary>
+		[SettingImportExport.CanImportExport]
 		public string DownloadUrl
 		{
 			get
@@ -166,6 +175,7 @@ namespace HnHMapSendTool.Core
 		/// <summary>
 		/// Логин для отдающего сервера, если надо.
 		/// </summary>
+		[SettingImportExport.CanImportExport]
 		public string DownloadUrlLogin
 		{
 			get
@@ -183,6 +193,7 @@ namespace HnHMapSendTool.Core
 		/// <summary>
 		/// Пароль для отдающего сервера, если надо.
 		/// </summary>
+		[SettingImportExport.CanImportExport]
 		public string DownloadUrlPassword
 		{
 			get
@@ -242,6 +253,10 @@ namespace HnHMapSendTool.Core
 		/// Комманда отправки всех сессий
 		/// </summary>
 		public ICommand DownloadGlobalСoordinatesCommand { get; }
+
+		public ICommand ExportSettingsCommand { get; }
+
+		public ICommand ImportSettingsCommand { get; }
 
 		/// <summary>
 		/// Отправить все сессии
@@ -324,15 +339,33 @@ namespace HnHMapSendTool.Core
 			}
 		}
 
-		#region INotifyPropertyChanged
-
-		public event PropertyChangedEventHandler PropertyChanged;
-		protected void OnPropertyChanged(string propName)
+		public void ExportSettings()
 		{
-			var handler = PropertyChanged;
-			handler?.Invoke(this, new PropertyChangedEventArgs(propName));
+			var vm = new SettingImportExport.SettingExportViewModel(
+				this.GetType().GetProperties()
+				.Where(p => p.GetCustomAttributes(typeof(SettingImportExport.CanImportExportAttribute), false).Any())
+				.Select(i => new SettingImportExport.SettingItem() { Title = i.Name, Value = i.GetValue(this, null).ToString() })
+				.Where(el => !string.IsNullOrEmpty(el.Value))
+			);
+
+			_viewProvider.ExportSettings(vm);
 		}
 
-		#endregion
+		public void ImportSettings()
+		{
+			var vm = new SettingImportExport.SettingImportViewModel();
+			_viewProvider.ImportSettings(vm);
+			if (vm.IsNeedImport)
+			{
+				foreach (var setting in vm.Settings)
+				{
+					var p = this.GetType().GetProperty(setting.Title);
+					if (p == null || !p.GetCustomAttributes(typeof(SettingImportExport.CanImportExportAttribute), false).Any())
+						continue;
+					p.SetValue(this, setting.Value, null);
+				}
+			}
+		}
 	}
 }
+
